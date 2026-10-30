@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ur" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مطالعہ کتاب - مدحتِ مصطفیٰ ﷺ</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', Arial, sans-serif;
+        }
+
+        body {
+            background: #090d16;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* Top Navigation Bar */
+        .top-bar {
+            width: 100%;
+            max-width: 600px;
+            background: #1e293b;
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .top-bar a {
+            color: #f3e5ab;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            background: #0f172a;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+        }
+
+        .top-bar h2 {
+            font-size: 18px;
+            color: #f3e5ab;
+        }
+
+        /* Book Page Display Box */
+        .reader-container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            min-height: 70vh;
+            border: 2px solid #d4af37;
+        }
+
+        .reader-container img {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Bottom Controls (Next / Previous Buttons) */
+        .bottom-nav {
+            width: 100%;
+            max-width: 600px;
+            background: #1e293b;
+            border: 1px solid #d4af37;
+            border-radius: 12px;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            margin-top: 10px;
+        }
+
+        .nav-btn {
+            background: linear-gradient(135deg, #d4af37, #996515);
+            color: #0f172a;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .nav-btn:hover {
+            background: #f3e5ab;
+            transform: scale(1.05);
+        }
+
+        .page-indicator {
+            font-size: 16px;
+            color: #cbd5e1;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+        <a href="index.html">🏠 ہوم</a>
+        <h2>مدحتِ مصطفیٰ ﷺ</h2>
+        <span style="font-size: 14px; color: #94a3b8;">137 صفحات</span>
+    </div>
+
+    <!-- Book Page View Box -->
+    <div class="reader-container">
+        <!-- यहाँ किताब का पेज दिखाई देगा (शुरुआत में पेज 1) -->
+        <img id="bookImage" src="pages/page1.jpg" alt="Book Page">
+    </div>
+
+    <!-- Bottom Navigation Bar -->
+    <div class="bottom-nav">
+        <button class="nav-btn" onclick="prevPage()">⬅️ پچھلا</button>
+        <span class="page-indicator" id="pageNumberText">صفحہ 1 / 137</span>
+        <button class="nav-btn" onclick="nextPage()">اگلا ➡️</button>
+    </div>
+
+    <script>
+        let currentPage = 1;
+        const totalPages = 137;
+
+        function updatePage() {
+            // यहाँ इमेज का फोल्डर और नाम सेट है (जैसे pages/page1.jpg)
+            document.getElementById("bookImage").src = "pages/page" + currentPage + ".jpg";
+            document.getElementById("pageNumberText").innerText = "صفحہ " + currentPage + " / " + totalPages;
+            window.scrollTo(0, 0);
+        }
+
+        function nextPage() {
+            if (currentPage < totalPages) {
+                currentPage++;
+                updatePage();
+            }
+        }
+
+        function prevPage() {
+            if (currentPage > 1) {
+                currentPage--;
+                updatePage();
+            }
+        }
+    </script>
+
+</body>
+</html>
