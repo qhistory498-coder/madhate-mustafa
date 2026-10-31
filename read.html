@@ -62,7 +62,6 @@
             position: relative;
             min-height: 70vh;
             border: 2px solid #0af37;
-            touch-action: pan-x pan-y;
         }
         .reader-container img {
             width: 100%;
@@ -173,13 +172,12 @@
             }
         }
 
-        // Smart Touch Swipe (Works with single finger swipe anywhere on screen)
+        // Perfect Touch Swipe & Tap Logic
         let touchStartX = 0;
         let touchEndX = 0;
         const readerBox = document.getElementById('readerBox');
 
         readerBox.addEventListener('touchstart', e => {
-            // Only trigger swipe if single touch (allows 2-finger zoom)
             if (e.touches.length === 1) {
                 touchStartX = e.touches[0].clientX;
             }
@@ -188,22 +186,27 @@
         readerBox.addEventListener('touchend', e => {
             if (e.changedTouches.length === 1) {
                 touchEndX = e.changedTouches[0].clientX;
-                handleSwipe();
+                let diff = touchEndX - touchStartX;
+                let threshold = 40; // Swipe sensitivity
+
+                if (diff < -threshold) {
+                    // Swipe Left -> Next Page (RTL)
+                    nextPage();
+                } else if (diff > threshold) {
+                    // Swipe Right -> Previous Page
+                    prevPage();
+                } else {
+                    // Tap Support: Tap on right side goes to next, left side goes to previous
+                    let rect = readerBox.getBoundingClientRect();
+                    let clickX = touchEndX - rect.left;
+                    if (clickX < rect.width / 2) {
+                        nextPage();
+                    } else {
+                        prevPage();
+                    }
+                }
             }
         }, {passive: true});
-
-        function handleSwipe() {
-            let diff = touchEndX - touchStartX;
-            let threshold = 50; // Minimum swipe distance
-
-            if (diff < -threshold) {
-                // Swipe Left -> Next Page (RTL Layout)
-                nextPage();
-            } else if (diff > threshold) {
-                // Swipe Right -> Previous Page
-                prevPage();
-            }
-        }
 
         // Load first page on start
         updatePage(0);
