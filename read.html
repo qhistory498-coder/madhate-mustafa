@@ -130,8 +130,13 @@
         const totalPages = 137;
 
         function updatePage() {
+            // Generates 4-digit zero-padded number (e.g., 0001, 0002... 0137)
             let paddedNum = String(currentPage).padStart(4, '0');
-            document.getElementById('bookImage').src = "Hafiz Shamim Giridih_page-" + paddedNum + ".jpg";
+            
+            // Direct exact match with your uploaded file names
+            let fileName = "Hafiz Shamim Giridih_page-" + paddedNum + ".jpg";
+            
+            document.getElementById('bookImage').src = fileName;
             document.getElementById('pageNumberText').innerText = "صفحہ " + currentPage + " / " + totalPages;
             window.scrollTo(0, 0);
         }
