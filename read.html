@@ -62,6 +62,7 @@
             position: relative;
             min-height: 70vh;
             border: 2px solid #0af37;
+            perspective: 1000px;
         }
         .reader-container img {
             width: 100%;
@@ -69,7 +70,8 @@
             max-height: 80vh;
             object-fit: contain;
             display: block;
-            transition: transform 0.2s ease, opacity 0.2s ease;
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
+            transform-origin: left center;
         }
         .bottom-nav {
             width: 100%;
@@ -132,9 +134,15 @@
         const totalPages = 137;
         const imgElement = document.getElementById('bookImage');
 
-        function updatePage(direction = 0) {
-            imgElement.style.transform = direction > 0 ? "translateX(-20px)" : direction < 0 ? "translateX(20px)" : "translateX(0)";
-            imgElement.style.opacity = "0.3";
+        function updatePage(effectType = 0) {
+            // Page turn 3D folding effect
+            if (effectType > 0) {
+                imgElement.style.transform = "rotateY(-30deg) scale(0.95)";
+                imgElement.style.opacity = "0.2";
+            } else if (effectType < 0) {
+                imgElement.style.transform = "rotateY(30deg) scale(0.95)";
+                imgElement.style.opacity = "0.2";
+            }
 
             setTimeout(() => {
                 let paddedNum = String(currentPage).padStart(4, '0');
@@ -152,10 +160,10 @@
 
                 document.getElementById('pageNumberText').innerText = "صفحہ " + currentPage + " / " + totalPages;
                 
-                imgElement.style.transform = "translateX(0)";
+                imgElement.style.transform = "rotateY(0deg) scale(1)";
                 imgElement.style.opacity = "1";
                 window.scrollTo(0, 0);
-            }, 100);
+            }, 150);
         }
 
         function nextPage() {
@@ -172,7 +180,7 @@
             }
         }
 
-        // Perfect Touch Swipe & Tap Logic
+        // Corrected Touch Swipe for RTL Book Reading
         let touchStartX = 0;
         let touchEndX = 0;
         const readerBox = document.getElementById('readerBox');
@@ -189,21 +197,13 @@
                 let diff = touchEndX - touchStartX;
                 let threshold = 40; // Swipe sensitivity
 
+                // Since Urdu book is RTL: 
+                // Swiping Right to Left (diff < -threshold) should go to NEXT page.
+                // Swiping Left to Right (diff > threshold) should go to PREVIOUS page.
                 if (diff < -threshold) {
-                    // Swipe Left -> Next Page (RTL)
                     nextPage();
                 } else if (diff > threshold) {
-                    // Swipe Right -> Previous Page
                     prevPage();
-                } else {
-                    // Tap Support: Tap on right side goes to next, left side goes to previous
-                    let rect = readerBox.getBoundingClientRect();
-                    let clickX = touchEndX - rect.left;
-                    if (clickX < rect.width / 2) {
-                        nextPage();
-                    } else {
-                        prevPage();
-                    }
                 }
             }
         }, {passive: true});
