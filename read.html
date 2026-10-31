@@ -10,6 +10,7 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', Arial, sans-serif;
+            user-select: none;
         }
         body {
             background: #000d16;
@@ -20,6 +21,7 @@
             justify-content: space-between;
             align-items: center;
             padding: 10px;
+            overflow-x: hidden;
         }
         .top-bar {
             width: 100%;
@@ -61,6 +63,7 @@
             position: relative;
             min-height: 70vh;
             border: 2px solid #0af37;
+            touch-action: pan-y;
         }
         .reader-container img {
             width: 100%;
@@ -68,6 +71,7 @@
             max-height: 80vh;
             object-fit: contain;
             display: block;
+            transition: transform 0.25s ease, opacity 0.25s ease;
         }
         .bottom-nav {
             width: 100%;
@@ -113,8 +117,8 @@
         <span style="font-size: 14px; color: #94a3b8;">137 / 1</span>
     </div>
 
-    <!-- Book Page View Box -->
-    <div class="reader-container">
+    <!-- Book Page View Box with Touch Swipe -->
+    <div class="reader-container" id="readerBox">
         <img id="bookImage" src="" alt="Book Page">
     </div>
 
@@ -128,35 +132,75 @@
     <script>
         let currentPage = 1;
         const totalPages = 137;
+        const imgElement = document.getElementById('bookImage');
 
-        function updatePage() {
-            // Generates 4-digit zero-padded number (e.g., 0001, 0002... 0137)
-            let paddedNum = String(currentPage).padStart(4, '0');
-            
-            // Direct exact match with your uploaded file names
-            let fileName = "Hafiz Shamim Giridih_page-" + paddedNum + ".jpg";
-            
-            document.getElementById('bookImage').src = fileName;
-            document.getElementById('pageNumberText').innerText = "صفحہ " + currentPage + " / " + totalPages;
-            window.scrollTo(0, 0);
+        function updatePage(direction = 0) {
+            imgElement.style.transform = direction > 0 ? "translateX(-25px)" : direction < 0 ? "translateX(25px)" : "translateX(0)";
+            imgElement.style.opacity = "0.3";
+
+            setTimeout(() => {
+                let paddedNum = String(currentPage).padStart(4, '0');
+                let path1 = "Hafiz Shamim Giridih_page-" + paddedNum + ".jpg";
+                let path2 = "Hafiz Shamim Giridih_page-" + paddedNum + ".JPG";
+
+                let testImg = new Image();
+                testImg.src = path1;
+                testImg.onload = function() {
+                    imgElement.src = path1;
+                };
+                testImg.onerror = function() {
+                    imgElement.src = path2;
+                };
+
+                document.getElementById('pageNumberText').innerText = "صفحہ " + currentPage + " / " + totalPages;
+                
+                imgElement.style.transform = "translateX(0)";
+                imgElement.style.opacity = "1";
+                window.scrollTo(0, 0);
+            }, 120);
         }
 
         function nextPage() {
             if (currentPage < totalPages) {
                 currentPage++;
-                updatePage();
+                updatePage(1);
             }
         }
 
         function prevPage() {
             if (currentPage > 1) {
                 currentPage--;
-                updatePage();
+                updatePage(-1);
+            }
+        }
+
+        // Touch Swipe Gesture Support
+        let touchStartX = 0;
+        let touchEndX = 0;
+        const readerBox = document.getElementById('readerBox');
+
+        readerBox.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        readerBox.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            let threshold = 40; 
+            if (touchEndX + threshold < touchStartX) {
+                // Left swipe -> Next page (RTL layout)
+                nextPage();
+            } else if (touchEndX > touchStartX + threshold) {
+                // Right swipe -> Previous page
+                prevPage();
             }
         }
 
         // Load first page on start
-        updatePage();
+        updatePage(0);
     </script>
 </body>
 </html>
