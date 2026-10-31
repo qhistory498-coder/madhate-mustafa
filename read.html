@@ -2,7 +2,7 @@
 <html lang="ur" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>مدحت مصطفیٰ ﷺ - مطالعہ کتاب</title>
     <style>
         * {
@@ -10,7 +10,6 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Jameel Noori Nastaleeq', 'Urdu Typesetting', Arial, sans-serif;
-            user-select: none;
         }
         body {
             background: #000d16;
@@ -63,7 +62,7 @@
             position: relative;
             min-height: 70vh;
             border: 2px solid #0af37;
-            touch-action: pan-y;
+            touch-action: pan-x pan-y;
         }
         .reader-container img {
             width: 100%;
@@ -71,7 +70,7 @@
             max-height: 80vh;
             object-fit: contain;
             display: block;
-            transition: transform 0.25s ease, opacity 0.25s ease;
+            transition: transform 0.2s ease, opacity 0.2s ease;
         }
         .bottom-nav {
             width: 100%;
@@ -117,7 +116,7 @@
         <span style="font-size: 14px; color: #94a3b8;">137 / 1</span>
     </div>
 
-    <!-- Book Page View Box with Touch Swipe -->
+    <!-- Book Page View Box -->
     <div class="reader-container" id="readerBox">
         <img id="bookImage" src="" alt="Book Page">
     </div>
@@ -135,7 +134,7 @@
         const imgElement = document.getElementById('bookImage');
 
         function updatePage(direction = 0) {
-            imgElement.style.transform = direction > 0 ? "translateX(-25px)" : direction < 0 ? "translateX(25px)" : "translateX(0)";
+            imgElement.style.transform = direction > 0 ? "translateX(-20px)" : direction < 0 ? "translateX(20px)" : "translateX(0)";
             imgElement.style.opacity = "0.3";
 
             setTimeout(() => {
@@ -157,7 +156,7 @@
                 imgElement.style.transform = "translateX(0)";
                 imgElement.style.opacity = "1";
                 window.scrollTo(0, 0);
-            }, 120);
+            }, 100);
         }
 
         function nextPage() {
@@ -174,27 +173,34 @@
             }
         }
 
-        // Touch Swipe Gesture Support
+        // Smart Touch Swipe (Works with single finger swipe anywhere on screen)
         let touchStartX = 0;
         let touchEndX = 0;
         const readerBox = document.getElementById('readerBox');
 
         readerBox.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, false);
+            // Only trigger swipe if single touch (allows 2-finger zoom)
+            if (e.touches.length === 1) {
+                touchStartX = e.touches[0].clientX;
+            }
+        }, {passive: true});
 
         readerBox.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, false);
+            if (e.changedTouches.length === 1) {
+                touchEndX = e.changedTouches[0].clientX;
+                handleSwipe();
+            }
+        }, {passive: true});
 
         function handleSwipe() {
-            let threshold = 40; 
-            if (touchEndX + threshold < touchStartX) {
-                // Left swipe -> Next page (RTL layout)
+            let diff = touchEndX - touchStartX;
+            let threshold = 50; // Minimum swipe distance
+
+            if (diff < -threshold) {
+                // Swipe Left -> Next Page (RTL Layout)
                 nextPage();
-            } else if (touchEndX > touchStartX + threshold) {
-                // Right swipe -> Previous page
+            } else if (diff > threshold) {
+                // Swipe Right -> Previous Page
                 prevPage();
             }
         }
